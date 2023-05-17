@@ -8,6 +8,7 @@ from rest_framework.filters import OrderingFilter
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from articles.models import Article, ReadArticle
+from articles.permissions import IsOwnerOrStaffOrReadOnly
 from articles.serializers import ArticleSerializer, ReadArticleSerializer
 from users.models import SubscriptionUser
 
@@ -15,7 +16,7 @@ from users.models import SubscriptionUser
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrStaffOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ["created", "updated"]
     filterset_fields = ["readarticle__is_read"]
