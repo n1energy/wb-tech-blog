@@ -3,6 +3,7 @@ from django.db import models
 
 
 class SubscriptionUser(models.Model):
+    """Model for managing subscription users."""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="authors")
     subscriber = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="subscribers"

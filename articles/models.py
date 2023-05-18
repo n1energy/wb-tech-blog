@@ -4,6 +4,7 @@ from django.urls import reverse
 
 
 class Article(models.Model):
+    """Model for articles(posts)"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     title = models.CharField(max_length=100)
     body = models.TextField()
@@ -24,6 +25,7 @@ class Article(models.Model):
 
 
 class ReadArticle(models.Model):
+    """Model for managing user-articles relations"""
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     is_read = models.BooleanField(default=False)
