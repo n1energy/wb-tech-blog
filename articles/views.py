@@ -5,7 +5,8 @@ from requests import Response
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 
 from articles.models import Article, ReadArticle
 from articles.permissions import IsOwnerOrStaffOrReadOnly
