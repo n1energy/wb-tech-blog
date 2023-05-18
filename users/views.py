@@ -26,10 +26,8 @@ class UsersViewSet(viewsets.ModelViewSet):
 
     def get_object(self):
         pk = self.kwargs.get("pk")
-
         if pk == "current":
             return self.request.user
-
         return super(UsersViewSet, self).get_object()
 
     @action(

@@ -34,7 +34,7 @@ class ArticlesApiTestCase(APITestCase):
     def test_get(self):
         url = reverse("articles-list")
         response = self.client.get(url)
-        articles = Article.objects.all().order_by("created")
+        articles = Article.objects.all().order_by("-created")
         serializer_data = ArticleSerializer(articles, many=True).data
         self.assertEqual(serializer_data, response.data.get("results"))
         self.assertEqual(3, Article.objects.all().count())
@@ -95,7 +95,7 @@ class ArticlesApiTestCase(APITestCase):
         refresh = RefreshToken.for_user(self.user_2)
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {refresh.access_token}")
         response = self.client.get(url, content_type="application/json")
-        articles = Article.objects.filter(user__authors__subscriber=self.user_2)
+        articles = Article.objects.filter(user__authors__subscriber=self.user_2).order_by("-created")
         serializer_data = ArticleSerializer(articles, many=True).data
         self.assertEqual(serializer_data, response.data.get("results"))
         self.assertEqual(status.HTTP_200_OK, response.status_code)

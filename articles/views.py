@@ -19,8 +19,18 @@ class ArticleViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwnerOrStaffOrReadOnly]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ["created", "updated"]
-    filterset_fields = ["readarticle__is_read"]
     ordering = ["-created"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == 'feed':
+            queryset = Article.objects.filter(user__authors__subscriber=self.request.user)
+        elif self.action == 'feed_read':
+            queryset = Article.objects.filter(
+                Q(user__authors__subscriber=self.request.user, readarticle__is_read=False)
+                | Q(user__authors__subscriber=self.request.user, readarticle__is_read=None)
+            )
+        return queryset
 
     @action(
         detail=False,
@@ -28,13 +38,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer_class=ArticleSerializer,
     )
     def feed(self, request, *args, **kwargs):
-        queryset = Article.objects.filter(user__authors__subscriber=self.request.user)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return super().list(self, request, *args, **kwargs)
 
     @action(
         detail=False,
@@ -42,16 +46,7 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer_class=ArticleSerializer,
     )
     def feed_read(self, request, *args, **kwargs):
-        queryset = Article.objects.filter(
-            Q(user__authors__subscriber=self.request.user, readarticle__is_read=False)
-            | Q(user__authors__subscriber=self.request.user, readarticle__is_read=None)
-        )
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return super().list(self, request, *args, **kwargs)
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
