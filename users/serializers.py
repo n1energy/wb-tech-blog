@@ -106,11 +106,6 @@ class SubscriptionUserSerializer(serializers.ModelSerializer):
         model = SubscriptionUser
         read_only_fields = ["subscriber"]
         fields = ["user", "subscriber"]
-        validators = [
-            UniqueTogetherValidator(
-                queryset=SubscriptionUser.objects.all(),
-                fields=["user", "subscriber"],
-            )]
 
     def validate(self, args):
         user = args.get('user', None)
