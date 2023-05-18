@@ -28,36 +28,6 @@ class UsersViewSet(viewsets.ModelViewSet):
             return self.request.user
         return super(UsersViewSet, self).get_object()
 
-    @action(detail=True, methods=["POST"], serializer_class=UserFollowingSerializer)
-    def sub(self, request, *args, **kwargs):
-        request.data["user"] = self.kwargs['pk']
-        request.data["subscriber"] = self.request.user
-        serializer = UserFollowingSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    @action(
-        detail=True,
-        methods=["POST"],
-        serializer_class=SubscriptionUserSerializer,
-        permission_classes=[IsAuthenticated],
-    )
-    def follow(self, request, *args, **kwargs):
-        queryset = User.objects.filter(pk=self.kwargs["pk"])
-        if queryset:
-            serializer = SubscriptionUserSerializer(
-                data=dict(subscriber=self.kwargs["pk"], user=request.user.id),
-                context={"request": request},
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(
-            {"error": "This pk is not valid!"}, status=status.HTTP_400_BAD_REQUEST
-        )
-
 
 class UserFollowingViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticatedOrReadOnly,)

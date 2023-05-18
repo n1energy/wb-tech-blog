@@ -23,7 +23,7 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=150,min_length=5, write_only=True)
+    password = serializers.CharField(max_length=150, min_length=5, write_only=True)
     email = serializers.EmailField(max_length=20, min_length=6)
     username = serializers.CharField(max_length=20, min_length=3)
     num_articles = serializers.IntegerField(read_only=True)
@@ -70,38 +70,11 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["email"] = user.email
         return token
 
-
-class RegistrationSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length=50, min_length=6)
-    username = serializers.CharField(max_length=50, min_length=3)
-    password = serializers.CharField(max_length=150, write_only=True)
-
-    class Meta:
-        model = User
-        fields = ("id", "first_name", "last_name", "email", "username", "password")
-
-    def validate(self, args):
-        email = args.get("email", None)
-        username = args.get("username", None)
-        if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                {"email": ("user with this email already exists")}
-            )
-        if User.objects.filter(username=username).exists():
-            raise serializers.ValidationError(
-                {"username": ("user with this username already exists")}
-            )
-
-        return super().validate(args)
-
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
 
 class SubscriptionUserSerializer(serializers.ModelSerializer):
-    # user = serializers.IntegerField(source='user.id')
-    # subscriber = serializers.IntegerField(source='subscriber.id', read_only=True)
-
     class Meta:
         model = SubscriptionUser
         read_only_fields = ["subscriber"]
@@ -116,16 +89,8 @@ class SubscriptionUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'error': ('already subscribed')})
         return super().validate(args)
 
-    # def create(self, validated_data):
-    #     return SubscribtionUser.objects.create_user(**validated_data)
-
 
 class UserFollowingSerializer(serializers.ModelSerializer):
-    # subscriber = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
-    # subscriber = serializers.CharField(source='subscriber.username', read_only=True)
-    # user = serializers.CharField(source='user.username')
-
-    # user = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
         model = SubscriptionUser
         fields = ["id", "user", "subscriber"]
