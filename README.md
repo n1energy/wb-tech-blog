@@ -1,10 +1,10 @@
 # wb-tech blog test task
-#### postgresql db:
+### 1. postgresql db:
 ####        'NAME': 'postgres'
 ####        'USER': 'postgres'
 ####        'PASSWORD': 'postgres'
 ####        'HOST': 'localhost'
 ####        'PORT': '5432'
 
-#### python manage.py migrate
-#### python manage.py runserver
+#### 2. python manage.py migrate
+#### 3. python manage.py runserver
