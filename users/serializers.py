@@ -75,45 +75,15 @@ class UserTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 
 class SubscriptionUserSerializer(serializers.ModelSerializer):
+    subscriber = serializers.CharField(read_only=True,
+                                       default=serializers.CurrentUserDefault()
+                                       )
+
     class Meta:
         model = SubscriptionUser
-        read_only_fields = ["subscriber"]
         fields = ["user", "subscriber"]
-
-    def validate(self, args):
-        user = args.get('user', None)
-        subscriber = args.get('subscriber', None)
-        if user == subscriber:
-            raise serializers.ValidationError({'error': ('cant subscribe to yourself')})
-        if SubscriptionUser.objects.filter(user=user, subscriber=subscriber).exists():
-            raise serializers.ValidationError({'error': ('already subscribed')})
-        return super().validate(args)
-
-
-class UserFollowingSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SubscriptionUser
-        fields = ["id", "user", "subscriber"]
-        read_only_fields = ["subscriber"]
         validators = [
             UniqueTogetherValidator(
                 queryset=SubscriptionUser.objects.all(),
                 fields=["user", "subscriber"],
             )]
-
-    def validate(self, args):
-        user = args.get("user", None)
-        subscriber = self.initial_data.get("subscriber", None)
-        if user == subscriber:
-            raise serializers.ValidationError({"error": ("cant subscribe to yourself")})
-        if SubscriptionUser.objects.filter(user=user, subscriber=subscriber).exists():
-            raise serializers.ValidationError({"error": ("already subscribed")})
-        return super().validate(args)
-
-    def create(self, validated_data):
-        instance = SubscriptionUser(
-            **validated_data,
-            user=self.context['kwargs']['pk'],
-            subscriber=self.context['request']['user'],
-        )
-        return instance

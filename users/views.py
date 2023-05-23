@@ -5,14 +5,11 @@ from django.db.models import Count
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
-from rest_framework.response import Response
+from rest_framework.permissions import (IsAuthenticatedOrReadOnly)
 from rest_framework_simplejwt.views import TokenObtainPairView
-
 from users.models import SubscriptionUser
 from users.serializers import (SubscriptionUserSerializer,
-                               UserFollowingSerializer, UserSerializer,
+                               UserSerializer,
                                UserTokenObtainPairSerializer)
 
 
@@ -35,10 +32,7 @@ class UserFollowingViewSet(viewsets.ModelViewSet):
     queryset = SubscriptionUser.objects.all()
 
     def perform_create(self, serializer):
-        try:
-            serializer.save(subscriber=self.request.user)
-        except IntegrityError:
-            raise ValidationError('This subscription is already exists.')
+        serializer.save(subscriber=self.request.user)
 
 
 class UserTokenObtainPairView(TokenObtainPairView):
